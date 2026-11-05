@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Student registration</title>
+</head>
+<body>
+    <h1>Student registration</h1>
+    <form method="post">
+       
+        <label>Student ID <input name="student_id" required></label><br>
+        <label>First name <input name="first_name" required></label><br>
+        <label>Last name <input name="last_name" required></label><br>
+        <label>Gender
+            <select name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </label><br>
+        <label>Date of birth <input type="date" name="date_of_birth" required></label><br>
+        <label>Contact number <input name="contact_number" required></label><br>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
