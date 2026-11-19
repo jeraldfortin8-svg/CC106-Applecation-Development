@@ -1,9 +1,57 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 
 from .models import student
 from .forms import StudentForm
+
+
+def staff_check(user):
+    return user.is_authenticated and user.is_staff
+
+
+@user_passes_test(staff_check, login_url='login')
+def staff_dashboard(request):
+    total_students = student.objects.count()
+
+    male_students = student.objects.filter(
+        Q(gender__iexact='Male') | Q(gender__iexact='M')
+    ).count()
+    female_students = student.objects.filter(
+        Q(gender__iexact='Female') | Q(gender__iexact='F')
+    ).count()
+
+    male_percent = (
+        male_students / total_students * 100
+        if total_students > 0 else 0
+    )
+    female_percent = (
+        female_students / total_students * 100
+        if total_students > 0 else 0
+    )
+
+    query = request.GET.get('q', '').strip()
+    students = student.objects.all().order_by('last_name', 'first_name')
+
+    if query:
+        students = students.filter(
+            Q(student_id__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        )
+
+    context = {
+        'total_students': total_students,
+        'male_students': male_students,
+        'female_students': female_students,
+        'male_percent': male_percent,
+        'female_percent': female_percent,
+        'students': students,
+        'query': query,
+    }
+
+    return render(request, 'registration/dashboard.html', context)
 
 
 def student_registration(request):
@@ -33,6 +81,7 @@ def registration_success(request):
     return render(request, 'registration/success.html')
 
 
+@user_passes_test(staff_check, login_url='login')
 def student_list(request):
     query = request.GET.get('q', '').strip()
     students = student.objects.all().order_by('last_name', 'first_name')
@@ -50,6 +99,7 @@ def student_list(request):
     })
 
 
+@user_passes_test(staff_check, login_url='login')
 def student_detail(request, pk):
     student_record = get_object_or_404(student, pk=pk)
     return render(request, 'registration/student_detail.html', {
@@ -57,6 +107,7 @@ def student_detail(request, pk):
     })
 
 
+@user_passes_test(staff_check, login_url='login')
 def student_create(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
@@ -73,6 +124,7 @@ def student_create(request):
     })
 
 
+@user_passes_test(staff_check, login_url='login')
 def student_update(request, pk):
     student_record = get_object_or_404(student, pk=pk)
 
@@ -92,6 +144,7 @@ def student_update(request, pk):
     })
 
 
+@user_passes_test(staff_check, login_url='login')
 def student_delete(request, pk):
     student_record = get_object_or_404(student, pk=pk)
 

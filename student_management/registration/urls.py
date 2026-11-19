@@ -7,6 +7,9 @@ urlpatterns = [
     path('register/', views.student_registration, name='register'),
     path('success/', views.registration_success, name='registration_success'),
 
+    # Staff dashboard
+    path('dashboard/', views.staff_dashboard, name='staff_dashboard'),
+
     # Module 07 routes
     path('students/', views.student_list, name='student_list'),
     path('students/create/', views.student_create, name='student_create'),
